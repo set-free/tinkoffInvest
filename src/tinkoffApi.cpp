@@ -1,10 +1,15 @@
 #include "tinkoffApi.hpp"
 
-tinkoffApi::tinkoffApi() {
-  url = "https://api-invest.tinkoff.ru/openapi/";
-  urlSandbox = "https://api-invest.tinkoff.ru/openapi/sandbox/orders";
+tinkoffApi::tinkoffApi()
+    : url("https://api-invest.tinkoff.ru/openapi/"),
+      urlSandbox("https://api-invest.tinkoff.ru/openapi/sandbox/") {
   result = "value is not write";
+  token = "token not set";
 }
+
+tinkoffApi::tinkoffApi(const std::string &newToken) : tinkoffApi() {
+  token = newToken;
+};
 
 std::string tinkoffApi::GetUrl() const { return url; }
 std::string tinkoffApi::GetUrlSandbox() const { return urlSandbox; }
@@ -18,10 +23,10 @@ std::string tinkoffApi::Get(const std::string &token) {
     header.push_back(tokenHeader);
     curlpp::Cleanup MyCleanup;
     curlpp::Easy myRequest;
-    myRequest.setOpt<curlpp::options::Url>(urlSandbox);
     myRequest.setOpt(new curlpp::options::Verbose(false));
-    myRequest.setOpt(new curlpp::options::WriteStream(&response));
     myRequest.setOpt(new curlpp::options::HttpHeader(header));
+    myRequest.setOpt<curlpp::options::Url>(urlSandbox);
+    myRequest.setOpt(new curlpp::options::WriteStream(&response));
     myRequest.perform();
     result = response.str();
     cURLpp::Options::Url myUrl;
@@ -36,30 +41,79 @@ std::string tinkoffApi::Get(const std::string &token) {
   return result;
 }
 
-void tinkoffApi::TestConnection(const std::string &token,
-                                const bool &debug) const {
+void tinkoffApi::TestConnection(const bool &debug) const {
   try {
     std::ostringstream response;
     std::list<std::string> header;
     const std::string tokenHeader = "Authorization: Bearer " + token;
-    spdlog::info("tokenHeader: " + tokenHeader);
-    header.push_back("Content-Type: application/json");
+    if (debug) {
+      spdlog::info("tokenHeader: " + tokenHeader);
+      spdlog::info("Send post to register broker account");
+    }
+    std::string regJson = "{\"brokerAccountType\": \"Tinkoff\"}";
+    int regJsonSize = static_cast<int>(regJson.size());
+    header.push_back("User-Agent: curl/7.77.7");
+    header.push_back("accept: application/json");
     header.push_back(tokenHeader);
+    header.push_back("Content-Type: application/json");
+    cURLpp::Options::Url reguestUrl;
+    cURLpp::Options::PostFields postFields;
     curlpp::Cleanup MyCleanup;
-    curlpp::Easy myRequest;
-    myRequest.setOpt<curlpp::options::Url>(urlSandbox);
-    myRequest.setOpt(new curlpp::options::Verbose(debug));
-    myRequest.setOpt(new curlpp::options::WriteStream(&response));
-    myRequest.setOpt(new curlpp::options::HttpHeader(header));
-    myRequest.perform();
-    if (curlpp::infos::ResponseCode::get(myRequest) >= 500) {
-      spdlog::error(
-          "Response code: " +
-          std::to_string(curlpp::infos::ResponseCode::get(myRequest)));
+    curlpp::Easy regReq;
+    regReq.setOpt(new curlpp::options::Verbose(debug));
+    regReq.setOpt(new curlpp::options::HttpHeader(header));
+    regReq.setOpt<curlpp::options::Url>(urlSandbox + "sandbox/register");
+    regReq.setOpt(new curlpp::options::PostFields(regJson));
+    regReq.setOpt(new curlpp::options::PostFieldSize(regJsonSize));
+    regReq.setOpt(new curlpp::options::SslEngineDefault());
+    //    regReq.setOpt(new curlpp::options::CustomRequest{"POST"});
+    regReq.setOpt(new curlpp::options::WriteStream(&response));
+    regReq.perform();
+    regReq.getOpt(reguestUrl);
+    regReq.getOpt(postFields);
+    if (debug) {
+      spdlog::info("Requested url: " + reguestUrl.getValue());
+      spdlog::info("Post fields: " + postFields.getValue());
+    }
+    if (curlpp::infos::ResponseCode::get(regReq) == 200) {
+      auto resultJson = response.str();
+      // TODO: Add parse JSON: "status":"Ok"
+      if (!resultJson.empty()) {
+        spdlog::info(resultJson);
+      }
+      if (debug) {
+        spdlog::info("Send get info about orders");
+      }
+      response.str("");
+      resultJson.clear();
+      header.clear();
+      header.push_back("User-Agent: curl/7.77.7");
+      header.push_back("accept: application/json");
+      header.push_back(tokenHeader);
+      curlpp::Easy takeInfReq;
+      takeInfReq.setOpt<curlpp::options::Url>(urlSandbox + "orders");
+      takeInfReq.setOpt(new curlpp::options::Verbose(debug));
+      takeInfReq.setOpt(new curlpp::options::WriteStream(&response));
+      takeInfReq.setOpt(new curlpp::options::HttpHeader(header));
+      takeInfReq.perform();
+      if (curlpp::infos::ResponseCode::get(takeInfReq) == 200) {
+        resultJson = response.str();
+        if (!resultJson.empty()) {
+          spdlog::info(resultJson);
+        }
+      } else {
+        spdlog::error(
+            "Response code: " +
+            std::to_string(curlpp::infos::ResponseCode::get(takeInfReq)));
+        std::exit(EXIT_FAILURE);
+      }
+    } else {
+      spdlog::error("Response code: " +
+                    std::to_string(curlpp::infos::ResponseCode::get(regReq)));
       std::exit(EXIT_FAILURE);
     }
   } catch (curlpp::RuntimeError &e) {
-    std::cout << e.what() << std::endl;
+    spdlog::error(e.what());
     std::exit(EXIT_FAILURE);
   } catch (curlpp::LogicError &e) {
     spdlog::error(e.what());

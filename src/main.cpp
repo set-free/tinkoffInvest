@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
   const std::string token = argv[1];
   const std::string getUrl =
       "https://api-invest.tinkoff.ru/openapi/sandbox/orders";
-  tinkoffApi tinkoff;
-  tinkoff.TestConnection(token, debug);
-  //  auto httpContent = HTTP.GetUrl(getUrl, token);
+  tinkoffApi tinkoff(token);
+  tinkoff.TestConnection(debug);
+  //  auto register = tinkoff.GetUrl(getUrl);
   return 0;
 }

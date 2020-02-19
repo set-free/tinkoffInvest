@@ -12,14 +12,16 @@
 
 class tinkoffApi {
 private:
-  std::string urlSandbox;
   std::string url;
+  std::string urlSandbox;
   std::string result;
+  std::string token;
 
 public:
   tinkoffApi();
+  tinkoffApi(const std::string &newToken);
   std::string GetUrl() const;
   std::string GetUrlSandbox() const;
   std::string Get(const std::string &token);
-  void TestConnection(const std::string &token, const bool &debug) const;
+  void TestConnection(const bool &debug) const;
 };
