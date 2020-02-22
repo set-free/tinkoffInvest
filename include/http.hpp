@@ -1,4 +1,5 @@
 #pragma once
+
 #include <curl/curl.h>
 #include <spdlog/spdlog.h>
 
@@ -11,18 +12,17 @@
 #include <sstream>
 #include <string>
 
-class tinkoffApi {
+class HTTP {
  private:
   std::string url;
   std::string urlSandbox;
-  std::string result;
   std::string token;
-  std::string strSnbReg;
+  std::string tokenHeader;
 
  public:
-  tinkoffApi();
-  tinkoffApi(const std::string &newToken);
-  std::string GetUrl() const;
-  std::string GetUrlSandbox() const;
-  void TestConnection(const bool &debug) const;
+  HTTP();
+  HTTP(const std::string &newToken);
+  std::string Get(const std::string &getUrl, const bool &debug) const;
+  std::string Post(const std::string &getUrl, const bool &debug,
+                   const std::string &postData) const;
 };

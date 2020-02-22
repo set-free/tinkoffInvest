@@ -15,7 +15,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # Add libcurl
 FIND_PACKAGE(CURL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CURL_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS})
+#target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS})
+
+# Add nlohmann Json
+FIND_PACKAGE(nlohmann_json REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json)
 
 # Add curlpp
 include_directories(${PROJECT_NAME} "/usr/include/curlpp")
@@ -31,3 +35,11 @@ set_target_properties(PROPERTIES
     CXX_STANDARD_REQUIRED ON
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
+
+
+if(nlohmann_json_FOUND)
+  message("Find nlohmann json: [X]")
+endif(nlohmann_json_FOUND)
+if(CURL_FOUND)
+  message("Find CURL: [X]")
+endif(CURL_FOUND)

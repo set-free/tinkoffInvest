@@ -1,0 +1,3 @@
+/home/isavel/src/git/tinkoffInvest/build/CMakeFiles/rebuild_cache.dir
+/home/isavel/src/git/tinkoffInvest/build/CMakeFiles/main.dir
+/home/isavel/src/git/tinkoffInvest/build/CMakeFiles/edit_cache.dir

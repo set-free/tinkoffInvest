@@ -1,6 +1,7 @@
-#include "tinkoffApi.hpp"
 #include <iostream>
-#include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
+
+#include "http.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
@@ -9,14 +10,19 @@ int main(int argc, char *argv[]) {
   }
   bool debug = false;
   if (argc > 2 and std::string(argv[2]) == "debug") {
-    spdlog::info("Enable debug mode");
+    std::cout << "Debug mode: ON" << std::endl;
     debug = true;
   }
   const std::string token = argv[1];
-  const std::string getUrl =
-      "https://api-invest.tinkoff.ru/openapi/sandbox/orders";
-  tinkoffApi tinkoff(token);
-  tinkoff.TestConnection(debug);
-  //  auto register = tinkoff.GetUrl(getUrl);
+  const std::string regHeader = "{\"brokerAccountType\": \"Tinkoff\"}";
+  const std::string urlProd = "https://api-invest.tinkoff.ru/openapi/";
+  const std::string urlTest = "https://api-invest.tinkoff.ru/openapi/sandbox/";
+  HTTP tinkoff(token);
+  tinkoff.Post(urlTest + "sandbox/register", debug, regHeader);
+  tinkoff.Get(urlTest + "orders", debug);
+  //  using json = nlohmann::json;
+  //  json resultGet = json::parse(tinkoff.Get(
+  //      "https://api-invest.tinkoff.ru/openapi/sandbox/orders", debug));
+  //  std::cout << "resultGet: " << resultGet["status"] << "\n";
   return 0;
 }
