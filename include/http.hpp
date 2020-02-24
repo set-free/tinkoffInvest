@@ -14,8 +14,6 @@
 
 class HTTP {
  private:
-  std::string url;
-  std::string urlSandbox;
   std::string token;
   std::string tokenHeader;
 

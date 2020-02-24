@@ -1,8 +1,8 @@
 #include "http.hpp"
 
-HTTP::HTTP()
-    : url("https://api-invest.tinkoff.ru/openapi/"),
-      urlSandbox("https://api-invest.tinkoff.ru/openapi/sandbox/") {}
+HTTP::HTTP() {}
+//    : url("https://api-invest.tinkoff.ru/openapi/"),
+//      urlSandbox("https://api-invest.tinkoff.ru/openapi/sandbox/") {}
 
 HTTP::HTTP(const std::string &newToken) : HTTP() {
   token = newToken;
