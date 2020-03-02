@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/main.dir/src/http.cpp.o CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/src/tinkoffApi.cpp.o  -o main  /usr/lib64/libcurl.so /usr/lib64/libcurlpp.so 

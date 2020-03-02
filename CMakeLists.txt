@@ -36,6 +36,11 @@ set_target_properties(PROPERTIES
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 
+#set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*;-warnings-as-errors=*")
+set_property(TARGET ${PROJECT_NAME}
+    PROPERTY CXX_CLANG_TIDY clang-tidy;-checks=*;)
+#    PROPERTY CXX_CLANG_TIDY clang-tidy;-checks=*;-warnings-as-errors=*)
+
 
 if(nlohmann_json_FOUND)
   message("Find nlohmann json: [X]")

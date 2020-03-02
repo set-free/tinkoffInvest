@@ -2,7 +2,7 @@
 
 Tinkoff::Tinkoff()
     : urlTest("https://api-invest.tinkoff.ru/openapi/sandbox/"),
-      urlProd("https://api-invest.tinkoff.ru/openapi/"){};
+      urlProd("https://api-invest.tinkoff.ru/openapi/") {};
 
 Tinkoff::Tinkoff(const std::string &newToken, const bool &_debug) : Tinkoff() {
   token = newToken;

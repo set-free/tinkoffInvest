@@ -12,11 +12,14 @@ class Tinkoff {
   const std::string urlTest;
   const std::string urlProd;
   std::string token;
-  bool debug;
+  bool debug{};
 
  public:
   Tinkoff();
+
   Tinkoff(const std::string &newToken, const bool &debug);
+
   std::string Register() const;
+
   std::string Orders() const;
 };

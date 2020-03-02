@@ -1,8 +1,6 @@
 #include "http.hpp"
 
-HTTP::HTTP() {}
-//    : url("https://api-invest.tinkoff.ru/openapi/"),
-//      urlSandbox("https://api-invest.tinkoff.ru/openapi/sandbox/") {}
+HTTP::HTTP() = default;
 
 HTTP::HTTP(const std::string &newToken) : HTTP() {
   token = newToken;
@@ -17,8 +15,8 @@ std::string HTTP::Get(const std::string &getUrl, const bool &debug) const {
       spdlog::info("tokenHeader: " + tokenHeader);
       spdlog::info("Sending GET request to: " + getUrl);
     }
-    header.push_back("User-Agent: curl/7.77.7");
-    header.push_back("Content-Type: application/json");
+    header.emplace_back("User-Agent: curl/7.77.7"); // TODO: emplace_back
+    header.emplace_back("Content-Type: application/json");
     header.push_back(tokenHeader);
     cURLpp::Options::Url url;
     cURLpp::Options::PostFields postFields;
@@ -47,7 +45,7 @@ std::string HTTP::Get(const std::string &getUrl, const bool &debug) const {
     } else {
       spdlog::error("Response data is empty");
       spdlog::error("Response code: " +
-                    std::to_string(curlpp::infos::ResponseCode::get(request)));
+          std::to_string(curlpp::infos::ResponseCode::get(request)));
       std::exit(EXIT_FAILURE);
     }
   } catch (curlpp::RuntimeError &e) {
@@ -71,10 +69,10 @@ std::string HTTP::Post(const std::string &getUrl, const bool &debug,
       spdlog::info("Sending POST DATA: " + postData);
     }
     int postDataSize = static_cast<int>(postData.size());
-    header.push_back("User-Agent: curl/7.77.7");
-    header.push_back("accept: application/json");
+    header.emplace_back("User-Agent: curl/7.77.7");
+    header.emplace_back("accept: application/json");
     header.push_back(tokenHeader);
-    header.push_back("Content-Type: application/json");
+    header.emplace_back("Content-Type: application/json");
     cURLpp::Options::Url url;
     cURLpp::Options::PostFields postFields;
     curlpp::Cleanup MyCleanup;
@@ -106,7 +104,7 @@ std::string HTTP::Post(const std::string &getUrl, const bool &debug,
     } else {
       spdlog::error("Response data is empty");
       spdlog::error("Response code: " +
-                    std::to_string(curlpp::infos::ResponseCode::get(request)));
+          std::to_string(curlpp::infos::ResponseCode::get(request)));
       std::exit(EXIT_FAILURE);
     }
   } catch (curlpp::RuntimeError &e) {
